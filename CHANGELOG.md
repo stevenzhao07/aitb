@@ -23,6 +23,12 @@
 - 判定附原因码；负控失效单独记 `V107`，不再与普通失败混在一起。
 - 渲染器拆出 `reports.py`，md/html/junit/sarif 四路同源，避免各写一套。
 
+### Fixed（首发前由 CI 抓到的两个真缺陷）
+- **Windows 上中文判据会让整次运行崩掉**：控制台默认 cp1252，`UnicodeEncodeError` 在打印判定原因时抛出，
+  退出码变成 1 且没有证据包。CLI 与独立探针都改成把 stdout/stderr 重设为 UTF-8（`errors="replace"`）。
+  本机（中文代码页）跑不出来，是 windows-latest 抓到的。
+- 负控步骤的 shell 断言写成 `aitb selftest | tee`，`pipefail` 把"按设计失败"的退出码 1 直接算作 step 失败。
+
 ### Known limits
 - 单维护者项目：bus factor = 1，达不到 OpenSSF gold 的"两位无关联贡献者"。
 - `pyver` 适配器在无解释器的机器上只能给 SKIP，不能证明代码在别的解释器上跑得通。

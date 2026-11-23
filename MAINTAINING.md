@@ -40,7 +40,14 @@
 - [ ] Windows 与 Linux 各一遍（`pyver` 适配器行为差异最大）；
 - [ ] 记录 `SHA256SUMS`（签名发布尚未做，见 CHANGELOG 的 Known limits）。
 
-## 六、已知脆弱点（诚实清单）
+## 六、推送通道（本机特有，别踩第二次）
+
+`git push https://github.com` 在本机常超时（443 不通），但 `api.github.com` 通。
+兜底路径：`python tools/push_via_api.py files "<提交信息>" <路径…>`（或 `tree` 全量对齐）。
+token 走环境变量，不落盘。代价是远端提交 SHA 与本地 git 不同源（内容同源），
+`git pull` 对不齐 —— 网络恢复后一律优先用 git，本脚本只在必要时用。
+
+## 七、已知脆弱点（诚实清单）
 
 - `pyver` 适配器靠错误串猜"解释器缺席还是坏死"，不同发行版措辞会变 —— 新增措辞要进 `_ABSENT_MARKS`；
 - 证据包 `manifest.json` 只保证**本次运行内自洽**，不保证防篡改（没有签名）；
