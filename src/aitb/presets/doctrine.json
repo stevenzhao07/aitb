@@ -1,0 +1,13 @@
+{
+ "_schema": "内置预设：不允许出现本机绝对路径",
+ "name": "doctrine",
+ "title": "教义自检（五条不变量）",
+ "preset_version": 1,
+ "profile": "smoke",
+ "notes": "把「能红、落码、审据、兑现、辨身」做成机器可判的五条。判的是台子自己，不是被检对象。解释器用 ${AITB_PYTHON}。",
+ "checks": [
+  {"id": "doctrine.five-invariants", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" ${AITB_PKG}/probes/doctrine.py",
+   "cwd": "${AITB_ROOT}", "expect": "DOCTRINE: 5/5 invariants hold", "timeout": 300}
+ ]
+}

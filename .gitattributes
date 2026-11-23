@@ -1,0 +1,4 @@
+# 统一换行：仓内一律 LF，Windows 检出也按 LF（Python/JSON/YAML 都不受影响）
+* text=auto eol=lf
+*.png binary
+*.whl binary

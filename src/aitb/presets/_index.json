@@ -1,0 +1,4 @@
+{
+ "_comment": "随包分发的内置预设索引。加/删 preset 必须同步这里，否则 doctrine T4 会红。",
+ "presets": ["selftest", "doctrine"]
+}

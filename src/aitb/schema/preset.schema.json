@@ -1,0 +1,50 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://raw.githubusercontent.com/stevenzhao07/aitb/main/src/aitb/schema/preset.schema.json",
+ "title": "AITB preset v1",
+ "description": "一个预设 = 一份可复跑的验收清单。文件内不允许出现本机绝对路径。",
+ "type": "object",
+ "required": ["name", "checks"],
+ "additionalProperties": true,
+ "properties": {
+  "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$", "description": "全小写；一条工作线一个名字"},
+  "preset_version": {"type": "integer", "enum": [1], "default": 1},
+  "title": {"type": "string", "description": "人读标题"},
+  "profile": {"type": "string", "enum": ["smoke", "standard", "gate"], "default": "standard",
+              "description": "smoke=几十秒；standard=可进日常；gate=对外发布前的门禁"},
+  "notes": {"type": "string", "description": "边界与已知局限。写在这里的每一句都不能被后来的运行推翻"},
+  "checks": {
+   "type": "array", "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": ["id", "type"],
+    "properties": {
+     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+     "type": {"type": "string", "enum": ["cmd", "files", "http", "pyver"],
+              "description": "内置四类；第三方适配器名由已安装包提供"},
+     "expect_status": {"type": "string", "enum": ["PASS", "FAIL"], "default": "PASS",
+                       "description": "FAIL 表示这是一条负控：它失败才说明台子会红"},
+     "needs_network": {"type": "boolean", "default": false},
+     "timeout": {"type": "integer", "minimum": 1, "maximum": 86400, "default": 300},
+
+     "cmd": {"type": "string", "description": "[type=cmd] 要执行的命令行"},
+     "expect": {"type": "string", "description": "[cmd/pyver] 必须出现的子串；省略则按退出码判"},
+     "cwd": {"type": "string", "description": "工作目录；相对路径相对项目根 ${AITB_ROOT}"},
+     "script": {"type": "string", "description": "[type=pyver] 交给每个解释器执行的脚本"},
+     "interpreters": {"type": "array", "items": {"type": "string"},
+                      "description": "[type=pyver] 解释器候选，缺省 python/python3/py -3 系列"},
+     "base": {"type": "string", "description": "[type=files] 相对路径的基准目录，缺省项目根"},
+     "paths": {"type": "array", "description": "[type=files] 要核对的文件",
+               "items": {"type": "object", "required": ["path"],
+                         "properties": {"path": {"type": "string"},
+                                        "min_size": {"type": "integer", "minimum": 1, "default": 1}}}},
+     "targets": {"type": "array", "description": "[type=http] 要探测的 URL",
+                 "items": {"type": "object", "required": ["url"],
+                           "properties": {"url": {"type": "string", "format": "uri"},
+                                          "expect": {"type": "integer", "default": 200},
+                                          "timeout": {"type": "integer", "default": 20}}}}
+    }
+   }
+  }
+ }
+}

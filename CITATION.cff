@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use AITB in your work, cite it as below."
+title: "AITB — Assurance Instrument Test Bench"
+abstract: "A preset-driven acceptance bench: each run produces a five-file evidence package and an exit code that anyone can re-run."
+type: software
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-11-23
+authors:
+  - name: "AITB contributors"
+repository-code: "https://github.com/stevenzhao07/aitb"
+keywords:
+  - conformance
+  - acceptance-testing
+  - evidence
+  - reproducibility
+  - sarif
+  - junit

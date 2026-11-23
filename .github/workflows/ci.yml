@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} · py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install
+        run: python -m pip install --upgrade pip && python -m pip install .
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Preset schema-level validation
+        run: aitb validate --all
+
+      - name: It must be able to go red (negative control)
+        shell: bash
+        run: |
+          aitb selftest | tee selftest.txt
+          grep -q "FAIL" selftest.txt || (echo "selftest produced no FAIL — the bench is blind" && exit 1)
+
+      - name: Self-test with --allow-red exits 0
+        run: aitb selftest --allow-red
+
+      - name: Doctrine (T1–T5) must hold
+        run: aitb doctrine
+
+      - name: Machine-readable outputs
+        run: |
+          aitb run selftest --allow-red --format junit --out selftest.junit.xml
+          aitb run selftest --allow-red --format sarif --out selftest.sarif
+          python -c "import xml.etree.ElementTree as ET, json; ET.parse('selftest.junit.xml'); json.load(open('selftest.sarif')); print('formats ok')"
+
+      - name: Upload evidence package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aitb-runs-${{ matrix.os }}-py${{ matrix.python }}
+          path: .aitb/runs
+          if-no-files-found: warn

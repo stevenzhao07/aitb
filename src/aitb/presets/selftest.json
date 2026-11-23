@@ -1,0 +1,20 @@
+{
+ "_schema": "内置预设：不允许出现本机绝对路径 —— 路径只能走变量占位（见包内 schema/preset.schema.json）或相对项目根的相对路径",
+ "name": "selftest",
+ "title": "台子自检（证明它会红）",
+ "preset_version": 1,
+ "profile": "smoke",
+ "notes": "一个永远绿的看板没有意义。本 preset 故意让三条检查按设计失败，验证 FAIL 会被抓住、负控不会失效、空文件糊不过去。用 `aitb selftest --allow-red` 可把它当成「台子还活着」的体检。解释器一律用 ${AITB_PYTHON}，不用裸 python —— 否则 macOS runner 上这条会因找不到命令而假红。",
+ "checks": [
+  {"id": "self.detects-false-pass", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"print('NOT THE EXPECTED LINE')\"",
+   "expect": "RESULT: ALL EXPECTATIONS MET", "expect_status": "FAIL"},
+  {"id": "self.detects-nonzero-exit", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"import sys;sys.exit(3)\"",
+   "expect_status": "FAIL"},
+  {"id": "self.detects-missing-file", "type": "files", "paths": [{"path": ".aitb/no_such_file_here.txt"}],
+   "expect_status": "FAIL"},
+  {"id": "self.real-pass-still-passes", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"print('OK-MARK')\"", "expect": "OK-MARK"}
+ ]
+}

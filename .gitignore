@@ -1,0 +1,9 @@
+.aitb/
+runs/
+*.egg-info/
+build/
+dist/
+__pycache__/
+*.pyc
+aitb.config.json
+config.local.json
