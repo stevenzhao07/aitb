@@ -32,8 +32,13 @@ jobs:
       - name: It must be able to go red (negative control)
         shell: bash
         run: |
-          aitb selftest | tee selftest.txt
-          grep -q "FAIL" selftest.txt || (echo "selftest produced no FAIL — the bench is blind" && exit 1)
+          set +e
+          aitb selftest > selftest.txt
+          rc=$?
+          set -e
+          echo "selftest exit code = $rc"
+          test "$rc" -eq 1 || { echo "expected exit 1 (it is supposed to fail), got $rc"; exit 1; }
+          grep -q "FAIL" selftest.txt || { echo "selftest produced no FAIL — the bench is blind"; exit 1; }
 
       - name: Self-test with --allow-red exits 0
         run: aitb selftest --allow-red
