@@ -177,7 +177,20 @@ def build_parser():
     return ap
 
 
+def _ensure_utf8_streams():
+    """Windows 控制台默认 cp1252，中文判定原因一打就 UnicodeEncodeError。
+
+    这不是"显示问题"，它会让整次运行崩掉 —— CI 就是这么抓到它的（windows-latest）。
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
 def main(argv=None):
+    _ensure_utf8_streams()
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] not in SUBCOMMANDS and not argv[0].startswith("-"):
         argv = ["run"] + argv          # 兼容 `aitb selftest --strict` 这种简写
