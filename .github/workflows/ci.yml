@@ -52,6 +52,23 @@ jobs:
       - name: Doctrine (T1–T5) must hold
         run: aitb doctrine
 
+      # 这一步是"外人能跑"的自动化证据：用仓库自带的上手样板，在一个陌生目录里
+      # 只靠 JSON 跑起来，且红色必须全部按设计（--allow-red 才允许 0）。
+      - name: Outsider example (examples/first-check) must work
+        shell: bash
+        working-directory: examples/first-check
+        run: |
+          rm -f report.json
+          aitb run preset.json --allow-red --format junit --out first.junit.xml
+          test -s report.json || { echo "the example tool did not produce report.json"; exit 1; }
+          set +e
+          aitb run preset.json > plain.txt
+          rc=$?
+          set -e
+          test "$rc" -eq 1 || { echo "without --allow-red it must exit 1 (one by-design FAIL), got $rc"; exit 1; }
+          grep -q "NEG-CTRL" plain.txt || { echo "negative control did not run"; exit 1; }
+          python -c "import xml.etree.ElementTree as ET; r=ET.parse('first.junit.xml').getroot(); f=sum(int(s.get('failures','0')) for s in r.iter('testsuite')); assert f==1, f; print('junit sees exactly 1 by-design failure')"
+
       - name: Machine-readable outputs
         run: |
           aitb run selftest --allow-red --format junit --out selftest.junit.xml

@@ -1,0 +1,21 @@
+{
+ "_schema": "外人上手样板：不写代码，只改 cmd / expect。解释器一律用 ${AITB_PYTHON}，别写裸 python（macOS runner 上常常没有，会把真通过判成假红）",
+ "name": "first-check",
+ "title": "第一条检查（把你自己的一条命令接进来）",
+ "preset_version": 1,
+ "profile": "first-check",
+ "notes": "在本目录跑：aitb run preset.json。四条检查分别证明：命令能跑、产物落地、产物不是空壳、闸本身是活的（负控）。换成你的工具时只改 cmd 与 expect。",
+ "checks": [
+  {"id": "my-tool.runs-and-prints", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"print('hello from my tool')\"",
+   "expect": "hello from my tool", "timeout": 30},
+  {"id": "my-tool.writes-report", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"open('report.json','w',encoding='utf-8').write('{\\\"ok\\\": true}')\"",
+   "timeout": 30},
+  {"id": "my-tool.report-not-empty", "type": "files",
+   "paths": [{"path": "report.json", "min_size": 8}]},
+  {"id": "my-tool.broken-must-fail", "type": "cmd",
+   "cmd": "\"${AITB_PYTHON}\" -c \"import sys;sys.exit(7)\"",
+   "expect_status": "FAIL", "timeout": 30}
+ ]
+}
