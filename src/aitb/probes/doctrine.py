@@ -13,6 +13,14 @@ from pathlib import Path
 
 from aitb import adapters, engine, paths, __version__
 
+# 这个探针是独立进程（不经 aitb.cli），所以自己也要把标准输出设成 UTF-8：
+# Windows 默认 cp1252，中文 detail 一打就 UnicodeEncodeError，整条探针被判成 rc=1。
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 rows = []
 
 
