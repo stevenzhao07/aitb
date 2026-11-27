@@ -1,5 +1,7 @@
 # AITB — Assurance Instrument Test Bench
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/stevenzhao07/aitb/HEAD)
+
 [![ci](https://github.com/stevenzhao07/aitb/actions/workflows/ci.yml/badge.svg)](https://github.com/stevenzhao07/aitb/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
